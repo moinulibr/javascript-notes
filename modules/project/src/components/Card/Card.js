@@ -1,4 +1,4 @@
-import { calculationTotalPrice, checkStock, TAX_RATE } from "../../utils/productUtils";
+import { calculationTotalPrice, checkStock, TAX_RATE } from "../../utils/productUtils.js";
 
 const itemPrice = 100;
 const itemQuantity = 2;

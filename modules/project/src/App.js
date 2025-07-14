@@ -1,4 +1,4 @@
-import { add, subtract } from './utils/math';
+import { add, subtract } from './utils/math.js';
 
 const addResult = add(4, 5);
 console.log(addResult);

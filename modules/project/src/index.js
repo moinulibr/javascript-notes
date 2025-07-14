@@ -1,5 +1,6 @@
 
 import { Button } from './components/Button/Button.js';
+import { ProductManager } from './services/productStore.js';
 import { userManager } from './services/userStore.js'
 
 const myButton = Button({
@@ -7,6 +8,7 @@ const myButton = Button({
     onClick: () => {
         console.log("Button clicked!")
         userManager();
+        ProductManager();
         testFun();
     }
 

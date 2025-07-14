@@ -1,7 +1,7 @@
 export const TAX_RATE = 0.15;
 
 export const calculationTotalPrice = (price, qty) => {
-    return (price * quantity) * (1 + TAX_RATE);
+    return (price * qty) * (1 + TAX_RATE);
 }
 
 export function checkStock(productId) {

@@ -6,6 +6,7 @@ class ProductApi {
     }
 
     getProductInfo() {
-        return `${this.name} (ID: ${this.id}) - Price: ${formatCurrency(this.price)}`;
+        return `${this.name} (ID: ${this.id}) - Price: ${this.price}`;
     }
 }
+export default ProductApi;
