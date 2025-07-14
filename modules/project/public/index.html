@@ -19,19 +19,15 @@
 
     <script type="module" src="../src/App.js"></script>
     <script type="module" src="../src/index.js"></script>
+    <script type="module" src="../src/services/userStore.js"></script>
 
     <script type="module">
         import { add } from '../src/utils/math.js';
-        console.log(add(5, 3)); // এখন এটি কাজ করবে
+        import { testFun } from "../src/index.js";
 
-
-        // এখানে আপনার App.js বা index.js থেকে কল করা ফাংশনগুলো ব্যবহার করতে পারেন
-        // উদাহরণস্বরূপ, যদি আপনার App.js-এ 'initializeApp' ফাংশন থাকে:
-        // initializeApp();
-
-        // অথবা যদি math.js এ 'add' ফাংশন থাকে:
-        // import { add } from '../src/utils/math.js'; // মডিউলের মধ্যে থাকলে এভাবে ইম্পোর্ট করতে হবে
-        console.log(add(5, 3));
+        //console.log(add(5, 3));
+        //testFun();
+        
     </script>
 </body>
 

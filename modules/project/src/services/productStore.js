@@ -1,4 +1,4 @@
-class ProductApi {
+class productStore {
     constructor(name, price, id) {
         this.name = name;
         this.price = price;
@@ -9,3 +9,5 @@ class ProductApi {
         return `${this.name} (ID: ${this.id}) - Price: ${formatCurrency(this.price)}`;
     }
 }
+
+export default productStore;
