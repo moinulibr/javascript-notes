@@ -132,3 +132,310 @@ new কীওয়ার্ড: একটি ক্লাসের নতুন
 উদাহরণ 3: Car ক্লাসে এনক্যাপসুলেশন
 
 ধরো, তুমি একটি গাড়ির ব্লুপ্রিন্ট তৈরি করছো। গাড়ির ইঞ্জিন, চাকা, জ্বালানি - এগুলো তার ভেতরের ডেটা। কিন্তু একজন ব্যবহারকারী কি সরাসরি ইঞ্জিনের ভেতরের পার্টস নিয়ন্ত্রণ করে? না। সে স্টিয়ারিং, এক্সিলারেটর, ব্রেক ব্যবহার করে।
+
+// Car.js - Car ক্লাসের ব্লুপ্রিন্ট (এনক্যাপসুলেশন)
+
+class Car {
+  #fuelLevel = 100; // প্রাইভেট প্রোপার্টি: ES2020 থেকে `#` দিয়ে প্রাইভেট প্রোপার্টি ডিফাইন করা যায়।
+                   // এটি সরাসরি বাইরে থেকে অ্যাক্সেস করা যাবে না।
+  #engineOn = false;
+
+  constructor(make, model) {
+    this.make = make;
+    this.model = model;
+    console.log(`${make} ${model} তৈরি হলো।`);
+  }
+
+  // মেথড: গাড়ি স্টার্ট করা
+  startEngine() {
+    if (this.#fuelLevel > 0 && !this.#engineOn) {
+      this.#engineOn = true;
+      console.log(`${this.make} ${this.model} এর ইঞ্জিন স্টার্ট হলো।`);
+    } else if (this.#engineOn) {
+      console.log(`ইঞ্জিন ইতিমধ্যেই স্টার্ট করা আছে।`);
+    } else {
+      console.log(`জ্বালানি নেই!`);
+    }
+  }
+
+  // মেথড: গাড়ি বন্ধ করা
+  stopEngine() {
+    if (this.#engineOn) {
+      this.#engineOn = false;
+      console.log(`${this.make} ${this.model} এর ইঞ্জিন বন্ধ হলো।`);
+    } else {
+      console.log(`ইঞ্জিন ইতিমধ্যেই বন্ধ আছে।`);
+    }
+  }
+
+  // মেথড: জ্বালানি চেক করা (এনক্যাপসুলেটেড ডেটা অ্যাক্সেসের জন্য গেটার)
+  getFuelLevel() {
+    return this.#fuelLevel;
+  }
+
+  // মেথড: জ্বালানি ভরা (এনক্যাপসুলেটেড ডেটা পরিবর্তনের জন্য সেটার)
+  refuel(amount) {
+    if (amount > 0) {
+      this.#fuelLevel = Math.min(100, this.#fuelLevel + amount);
+      console.log(`জ্বালানি ভরা হলো। বর্তমান স্তর: ${this.#fuelLevel}%`);
+    }
+  }
+}
+
+// --- ব্যবহার ---
+const myCar = new Car("Toyota", "Corolla");
+
+// myCar.#fuelLevel; // এটি সরাসরি অ্যাক্সেস করতে পারবে না, এরর দেবে!
+
+myCar.startEngine(); // ইঞ্জিন স্টার্ট করার চেষ্টা
+myCar.refuel(50);    // জ্বালানি ভরো
+myCar.startEngine(); // এখন স্টার্ট হবে
+
+console.log(`আমার গাড়ির জ্বালানি স্তর: ${myCar.getFuelLevel()}%`);
+
+myCar.stopEngine();
+myCar.startEngine(); // আবার স্টার্ট করার চেষ্টা
+
+
+
+
+
+
+
+
+
+এই উদাহরণে, fuelLevel এবং engineOn প্রোপার্টিগুলো # দিয়ে প্রাইভেট করা হয়েছে। এর মানে হলো, তুমি ক্লাসের বাইরে থেকে সরাসরি myCar.#fuelLevel = 0; লিখতে পারবে না। তোমাকে refuel() এবং getFuelLevel() এর মতো পাবলিক মেথডগুলো ব্যবহার করে ডেটা অ্যাক্সেস বা পরিবর্তন করতে হবে। এটিই এনক্যাপসুলেশন, যা ডেটার সুরক্ষা বাড়ায়।
+
+ইনহেরিটেন্স (Inheritance): ব্লুপ্রিন্ট থেকে বিশেষায়িত ব্লুপ্রিন্ট তৈরি করা
+ইনহেরিটেন্স হলো যখন একটি ক্লাস (Child Class) অন্য একটি ক্লাস (Parent/Base Class) থেকে প্রোপার্টি এবং মেথড উত্তরাধিকার সূত্রে পায়। এটি কোড পুনরায় ব্যবহার করতে সাহায্য করে এবং বস্তুর মধ্যে "is-a" (এটি একটি) সম্পর্ক স্থাপন করে।
+
+উদাহরণ 4: Building এবং CommercialBuilding ক্লাসের ইনহেরিটেন্স
+
+ধরি, তুমি Building নামে একটি সাধারণ ব্লুপ্রিন্ট তৈরি করেছ। এখন, তুমি CommercialBuilding নামে একটি বিশেষ ধরনের বিল্ডিং তৈরি করতে চাও, যার কিছু অতিরিক্ত বৈশিষ্ট্য থাকবে (যেমন দোকানের সংখ্যা, অফিসের সংখ্যা)।
+
+// Building.js - সাধারণ বিল্ডিং ব্লুপ্রিন্ট (Parent Class)
+
+class Building {
+  constructor(name, floors, areaSqFt) {
+    this.name = name;
+    this.floors = floors;
+    this.areaSqFt = areaSqFt;
+    this.isConstructed = false;
+  }
+
+  // মেথড: বিল্ডিংয়ের তথ্য প্রদান
+  getBuildingInfo() {
+    return `${this.name} বিল্ডিংয়ে ${this.floors}টি ফ্লোর আছে এবং এর আয়তন ${this.areaSqFt} বর্গফুট।`;
+  }
+
+  // মেথড: নির্মাণ সম্পন্ন করা
+  completeConstruction() {
+    if (!this.isConstructed) {
+      this.isConstructed = true;
+      console.log(`${this.name} নির্মাণ সম্পন্ন হয়েছে।`);
+    } else {
+      console.log(`${this.name} ইতিমধ্যেই নির্মিত।`);
+    }
+  }
+}
+
+// CommercialBuilding.js - CommercialBuilding ক্লাসের ব্লুপ্রিন্ট (Child Class)
+// এটি Building ক্লাস থেকে ইনহেরিট করছে
+
+class CommercialBuilding extends Building { // 'extends' কীওয়ার্ড ব্যবহার করে ইনহেরিট করা হয়
+  constructor(name, floors, areaSqFt, numberOfShops, numberOfOffices) {
+    // super(): প্যারেন্ট ক্লাসের constructor কল করে তার প্রোপার্টিগুলো ইনিশিয়ালাইজ করে।
+    // Child ক্লাসে constructor থাকলে super() অবশ্যই ব্যবহার করতে হবে এবং সবার আগে কল করতে হবে।
+    super(name, floors, areaSqFt);
+
+    this.numberOfShops = numberOfShops;
+    this.numberOfOffices = numberOfOffices;
+  }
+
+  // মেথড: কমার্শিয়াল বিল্ডিংয়ের অতিরিক্ত তথ্য
+  getCommercialInfo() {
+    return `${this.name} এ ${this.numberOfShops}টি দোকান এবং ${this.numberOfOffices}টি অফিস আছে।`;
+  }
+
+  // Method Overriding (পলিমরফিজমের একটি অংশ):
+  // প্যারেন্ট ক্লাসের মেথডকে চাইল্ড ক্লাসে নিজের মতো করে পরিবর্তন করা।
+  getBuildingInfo() {
+    const baseInfo = super.getBuildingInfo(); // super.method() দিয়ে প্যারেন্ট মেথড কল করা যায়
+    return `${baseInfo} এটি একটি বাণিজ্যিক ভবন।`;
+  }
+}
+
+// --- ব্যবহার ---
+const residentialComplex = new Building("আবাসিক কমপ্লেক্স", 10, 50000);
+console.log(residentialComplex.getBuildingInfo());
+residentialComplex.completeConstruction();
+
+const shoppingMall = new CommercialBuilding("সিটি সেন্টার মল", 5, 80000, 150, 20);
+console.log(shoppingMall.getBuildingInfo()); // এখানে ওভাররাইড করা মেথড কল হচ্ছে
+console.log(shoppingMall.getCommercialInfo());
+shoppingMall.completeConstruction(); // প্যারেন্ট ক্লাস থেকে উত্তরাধিকার সূত্রে প্রাপ্ত মেথড
+
+
+নোট:
+
+extends কীওয়ার্ড: একটি ক্লাস অন্য ক্লাস থেকে উত্তরাধিকার সূত্রে পেতে extends ব্যবহার করে।
+
+super() কীওয়ার্ড: চাইল্ড ক্লাসের constructor-এর ভেতরে super() কল করা বাধ্যতামূলক, যদি চাইল্ড ক্লাসের নিজস্ব constructor থাকে। এটি প্যারেন্ট ক্লাসের constructor কল করে এবং প্যারেন্ট ক্লাসের প্রোপার্টিগুলো ইনিশিয়ালাইজ করে।
+
+মেথড ওভাররাইডিং: যদি চাইল্ড ক্লাসে প্যারেন্ট ক্লাসের মতো একই নামের কোনো মেথড ডিফাইন করা হয়, তাহলে চাইল্ড ক্লাসের মেথডটি কার্যকর হবে। তুমি super.methodName() ব্যবহার করে প্যারেন্ট ক্লাসের মূল মেথডটি চাইল্ড ক্লাসের মেথডের ভেতরে কল করতে পারো।
+
+পলিমরফিজম (Polymorphism): অনেক রূপের ক্ষমতা
+পলিমরফিজম মানে "অনেক রূপ"। OOP-এ এর মানে হলো, ভিন্ন ভিন্ন অবজেক্ট একই নামের মেথড কল করার পরেও ভিন্ন ভিন্ন আচরণ করতে পারে। এটি মূলত ইনহেরিটেন্স এবং মেথড ওভাররাইডিং এর মাধ্যমে অর্জন করা হয়।
+উদাহরণ 5: Vehicle এবং তার থেকে প্রাপ্ত ক্লাসগুলোতে পলিমরফিজম
+
+ধরো, তোমার কাছে বিভিন্ন ধরণের যানবাহন আছে: গাড়ি, বাইক, প্লেন। প্রত্যেকেই "চালনা" করতে পারে, কিন্তু তাদের চালনার পদ্ধতি ভিন্ন।
+
+// Vehicle.js - সাধারণ যানবাহন ব্লুপ্রিন্ট (Base Class)
+
+class Vehicle {
+  constructor(brand) {
+    this.brand = brand;
+  }
+
+  // মেথড: যানটিকে চালনা করা
+  drive() {
+    console.log(`${this.brand} চলছে... (সাধারণ চালনা)`);
+  }
+}
+
+// Car.js - গাড়ি ব্লুপ্রিন্ট
+class Car extends Vehicle {
+  constructor(brand, model) {
+    super(brand);
+    this.model = model;
+  }
+
+  // মেথড ওভাররাইড: গাড়ির জন্য ভিন্নভাবে চালনা
+  drive() {
+    console.log(`${this.brand} ${this.model} হাইওয়েতে দ্রুত গতিতে চলছে!`);
+  }
+}
+
+// Bicycle.js - বাইসাইকেল ব্লুপ্রিন্ট
+class Bicycle extends Vehicle {
+  constructor(brand, type) {
+    super(brand);
+    this.type = type;
+  }
+
+  // মেথড ওভাররাইড: বাইসাইকেলের জন্য ভিন্নভাবে চালনা
+  drive() {
+    console.log(`${this.brand} ${this.type} প্যাডেল করে চলছে।`);
+  }
+}
+
+// Airplane.js - বিমান ব্লুপ্রিন্ট
+class Airplane extends Vehicle {
+  constructor(brand, airline) {
+    super(brand);
+    this.airline = airline;
+  }
+
+  // মেথড ওভাররাইড: প্লেনের জন্য ভিন্নভাবে চালনা
+  drive() { // যদিও প্লেন আকাশে ওড়ে, আমরা সিম্পলিসিটির জন্য drive ব্যবহার করছি
+    console.log(`${this.brand} ${this.airline} আকাশপথে উড়ছে!`);
+  }
+}
+
+// --- ব্যবহার (পলিমরফিজম) ---
+
+const myCar = new Car("Honda", "Civic");
+const myBicycle = new Bicycle("Hero", "Mountain Bike");
+const myAirplane = new Airplane("Boeing", "Biman Bangladesh Airlines");
+const unknownVehicle = new Vehicle("Generic");
+
+const vehicles = [myCar, myBicycle, myAirplane, unknownVehicle];
+
+console.log("\n--- বিভিন্ন যান চালনা ---");
+vehicles.forEach(vehicle => {
+  vehicle.drive(); // একই 'drive()' মেথড কল করা হচ্ছে, কিন্তু প্রতিটি অবজেক্ট ভিন্ন আচরণ করছে
+});
+
+/* আউটপুট:
+Honda Civic হাইওয়েতে দ্রুত গতিতে চলছে!
+Hero Mountain Bike প্যাডেল করে চলছে।
+Boeing Biman Bangladesh Airlines আকাশপথে উড়ছে!
+Generic চলছে... (সাধারণ চালনা)
+*/
+
+এই উদাহরণে, vehicles অ্যারেতে ভিন্ন ভিন্ন ক্লাসের (Car, Bicycle, Airplane, Vehicle) অবজেক্ট রয়েছে। কিন্তু যখন আমরা লুপের মধ্যে vehicle.drive() কল করি, তখন প্রতিটি অবজেক্ট তার নিজস্ব drive() মেথড চালায়। এটিই পলিমরফিজম – একই মেথড কল ভিন্ন ভিন্ন অবজেক্টে ভিন্ন ফলাফল দিচ্ছে।
+
+অ্যাবস্ট্রাকশন (Abstraction): অপ্রয়োজনীয় বিশদ গোপন করা
+অ্যাবস্ট্রাকশন হলো ব্যবহারকারীর কাছে শুধুমাত্র প্রয়োজনীয় ফাংশনালিটি প্রকাশ করা এবং অভ্যন্তরীণ জটিলতা গোপন রাখা। জাভাস্ক্রিপ্টে অ্যাবস্ট্রাকশন সরাসরি 'অ্যাবস্ট্রাক্ট ক্লাস' দিয়ে বাস্তবায়ন করা হয় না (যেমন জাভা বা C++ এ হয়), তবে ক্লাস, মডিউল এবং প্রাইভেট প্রোপার্টির মাধ্যমে এটি অর্জন করা যায়।
+
+উদাহরণ 6: একটি MediaPlayer ক্লাসে অ্যাবস্ট্রাকশন
+
+ধরো, তুমি একটি মিডিয়া প্লেয়ার তৈরি করছো। একজন ব্যবহারকারী শুধু জানে সে 'প্লে' বা 'পজ' বাটনে ক্লিক করতে পারে। প্লেয়ারের ভেতরের অডিও ডিকোডিং, বাফারিং, বা ফাইল লোডিংয়ের জটিলতা তার জানার দরকার নেই।
+
+// MediaPlayer.js - মিডিয়া প্লেয়ারের ব্লুপ্রিন্ট (অ্যাবস্ট্রাকশন)
+
+class MediaPlayer {
+  #currentTrack = null;
+  #isPlaying = false;
+  #volume = 50; // 0-100
+
+  // প্রাইভেট মেথড: বাইরে থেকে সরাসরি কল করা যাবে না
+  #loadAudioFile(trackName) {
+    console.log(`(অভ্যন্তরীণ) ${trackName} লোড করা হচ্ছে...`);
+    // এখানে ফাইল লোডিং, ডিকোডিং ইত্যাদির জটিল লজিক থাকবে
+    this.#currentTrack = trackName;
+  }
+
+  #decodeAudio() {
+    console.log(`(অভ্যন্তরীণ) অডিও ডিকোড করা হচ্ছে...`);
+    // অডিও ডিকোডিং লজিক
+  }
+
+  constructor(playerType) {
+    this.playerType = playerType;
+    console.log(`${playerType} মিডিয়া প্লেয়ার তৈরি হলো।`);
+  }
+
+  // পাবলিক মেথড: ব্যবহারকারী এইগুলোই ব্যবহার করবে
+  play(trackName) {
+    if (this.#isPlaying) {
+      console.log(`ইতিমধ্যেই ${this.#currentTrack} চলছে।`);
+      return;
+    }
+    this.#loadAudioFile(trackName); // অভ্যন্তরীণ মেথড ব্যবহার করা হচ্ছে
+    this.#decodeAudio();            // অভ্যন্তরীণ মেথড ব্যবহার করা হচ্ছে
+    this.#isPlaying = true;
+    console.log(`▶️ এখন চলছে: ${this.#currentTrack}`);
+  }
+
+  pause() {
+    if (this.#isPlaying) {
+      this.#isPlaying = false;
+      console.log(`⏸️ ${this.#currentTrack} পজ করা হলো।`);
+    } else {
+      console.log(`কোনো গান চলছে না।`);
+    }
+  }
+
+  setVolume(level) {
+    this.#volume = Math.max(0, Math.min(100, level));
+    console.log(`ভলিউম সেট করা হলো: ${this.#volume}`);
+  }
+
+  getCurrentTrack() {
+    return this.#currentTrack;
+  }
+}
+
+// --- ব্যবহার ---
+const musicPlayer = new MediaPlayer("পোর্টেবল");
+
+musicPlayer.play("শাওন গানওয়ালা - ইচ্ছেঘুড়ি");
+musicPlayer.setVolume(75);
+musicPlayer.pause();
+musicPlayer.play("আর্টসেল - অন্য সময়");
+
+// musicPlayer.#loadAudioFile("লুকানো গান"); // এরর দেবে! প্রাইভেট মেথড অ্যাক্সেস করা যাবে না।
+// musicPlayer.#isPlaying = true; // এরর দেবে! প্রাইভেট প্রোপার্টি অ্যাক্সেস করা যাবে না।
+
+এই উদাহরণে, MediaPlayer ক্লাসের #loadAudioFile এবং #decodeAudio মেথডগুলো প্রাইভেট করা হয়েছে। ব্যবহারকারী (বা ক্লাসের বাইরের কোড) এই অভ্যন্তরীণ জটিলতাগুলো নিয়ে চিন্তা করে না। সে শুধু play(), pause(), setVolume() - এই পাবলিক ইন্টারফেসগুলো ব্যবহার করে প্লেয়ার নিয়ন্ত্রণ করে। এটিই অ্যাবস্ট্রাকশন – অপ্রয়োজনীয় বিশদ গোপন রেখে সহজবোধ্য ইন্টারফেস প্রদান করা।
