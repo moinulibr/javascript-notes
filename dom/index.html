@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="bn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DOM Challenge</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 30px;
+        }
+
+        .box {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 6px 0;
+        }
+
+        button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+        <h2>TODO List</h2>
+
+        <input id="todoInput" placeholder="Write something...">
+        <button id="addBtn">Add</button>
+
+        <ul id="todoList"></ul>
+    </div>
+
+    <script>
+        /* YOU WILL WRITE JS HERE */
+        const getIdName = (idName) => {
+            return document.getElementById(idName);
+        }
+        const todoInput = getIdName('todoInput');
+        const addBtn = getIdName('addBtn');
+        const todoList = getIdName('todoList');
+
+        addBtn.addEventListener('click',function(){
+            const inputValue = todoInput.value;
+            if(inputValue){
+               const li = document.createElement('li');
+               li.textContent = inputValue +' - remove';
+               todoList.appendChild(li);
+           }else{
+               alert('please type somethings..');
+           }
+           todoInput.value = '';
+           todoInput.focus();
+        });
+
+    </script>
+
+</body>
+
+</html>

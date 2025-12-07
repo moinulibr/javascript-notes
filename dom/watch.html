@@ -1,0 +1,39 @@
+<!-- mutation-observer.html -->
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>MutationObserver Demo</title>
+</head>
+
+<body>
+    <h3>MutationObserver</h3>
+    <div id="box"></div>
+    <button id="add">Add Element</button>
+    <script>
+        const box = document.getElementById('box');
+        const btn = document.getElementById('add');
+
+        const observer = new MutationObserver((mutations) => {
+            for (const m of mutations) {
+                console.log('Mutation', m);
+                if (m.type === 'childList') {
+                    console.log('Child added/removed', m.addedNodes, m.removedNodes);
+                }
+            }
+        });
+
+        observer.observe(box, { childList: true, subtree: false });
+
+        btn.addEventListener('click', () => {
+            const p = document.createElement('p');
+            p.textContent = 'New item at ' + new Date().toLocaleTimeString();
+            box.appendChild(p);
+            // After 3 items, remove oldest
+            if (box.children.length > 3) box.removeChild(box.children[0]);
+        });
+    </script>
+</body>
+
+</html>

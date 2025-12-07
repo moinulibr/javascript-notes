@@ -1,0 +1,115 @@
+<!-- todo-delegation.html -->
+<!doctype html>
+<html lang="bn">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Todo App (Event Delegation)</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .todo {
+            max-width: 600px;
+            border: 1px solid #eee;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .done {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        button {
+            margin-left: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="todo">
+        <h3>Todo (Delegation)</h3>
+        <form id="todoForm">
+            <input id="todoInput" placeholder="Add task..." required />
+            <button>Add</button>
+        </form>
+        <ul id="list"></ul>
+    </div>
+
+    <script>
+        const form = document.getElementById('todoForm');
+        const input = document.getElementById('todoInput');
+        const list = document.getElementById('list');
+
+        // Load from localStorage
+        const TODOS_KEY = 'my_todos_v1';
+        let todos = JSON.parse(localStorage.getItem(TODOS_KEY) || '[]');
+
+        function renderTodos() {
+            // Use DocumentFragment for performance
+            const frag = document.createDocumentFragment();
+            list.innerHTML = '';
+            todos.forEach((t, idx) => {
+                const li = document.createElement('li');
+                li.dataset.index = idx;
+                li.innerHTML = `
+          <span class="${t.done ? 'done' : ''}">${escapeHTML(t.text)}</span>
+          <div>
+            <button data-action="toggle">✓</button>
+            <button data-action="delete">✕</button>
+          </div>
+        `;
+                frag.appendChild(li);
+            });
+            list.appendChild(frag);
+            localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
+        }
+
+        // Escape to avoid XSS when using innerHTML pieces
+        function escapeHTML(s) {
+            return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            todos.push({ text: input.value.trim(), done: false });
+            input.value = '';
+            renderTodos();
+        });
+
+        // Event delegation on the list
+        list.addEventListener('click', (e) => {
+            const action = e.target.dataset.action;
+            if (!action) return;
+            const li = e.target.closest('li');
+            const idx = Number(li.dataset.index);
+            if (action === 'toggle') {
+                todos[idx].done = !todos[idx].done;
+            } else if (action === 'delete') {
+                todos.splice(idx, 1);
+            }
+            renderTodos();
+        });
+
+        // Initial render
+        renderTodos();
+    </script>
+</body>
+
+</html>

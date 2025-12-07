@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="bn">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Basic DOM: Theme Toggle & Live Preview</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            transition: background .2s, color .2s;
+        }
+
+        .dark {
+            background: #121212;
+            color: #eee;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 6px;
+            max-width: 600px;
+        }
+
+        .preview {
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px dashed #ccc;
+            min-height: 40px;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>Theme Toggle & Live Preview</h2>
+        <label>
+            <input id="toggleTheme" type="checkbox" />
+            Dark theme
+        </label>
+
+        <hr />
+
+        <label>Type something (live preview):</label>
+        <input id="textInput" placeholder="Type here..." />
+        <div class="preview" id="preview">Preview shows here...</div>
+
+        <button id="clearBtn">Clear</button>
+    </div>
+
+    <script>
+        // Selecting
+        const toggle = document.getElementById('toggleTheme');
+        const input = document.getElementById('textInput');
+        const preview = document.getElementById('preview');
+        const clearBtn = document.getElementById('clearBtn');
+
+        // Load saved theme
+        if (localStorage.getItem('dark') === '1') {
+            document.body.classList.add('dark');
+            toggle.checked = true;
+        }
+
+        toggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark', toggle.checked);
+            localStorage.setItem('dark', toggle.checked ? '1' : '0');
+        });
+
+        // Live preview using input event
+        input.addEventListener('input', (e) => {
+            // Use textContent to avoid rendering HTML
+            preview.textContent = e.target.value || 'Preview shows here...';
+        });
+
+        clearBtn.addEventListener('click', () => {
+            input.value = '';
+            preview.textContent = 'Preview shows here...';
+            input.focus();
+        });
+    </script>
+</body>
+
+</html>
