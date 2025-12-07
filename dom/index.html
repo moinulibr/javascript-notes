@@ -6,25 +6,42 @@
     <title>DOM Challenge</title>
     <style>
         body {
-            font-family: Arial;
-            padding: 30px;
+            font-family: sans-serif;
+            padding: 20px;
         }
-
         .box {
-            max-width: 400px;
-            margin: auto;
+            max-width: 600px;
+            border: 1px solid #eee;
+            padding: 12px;
+            border-radius: 8px;
         }
-
+        .todo {
+            max-width: 600px;
+            border: 1px solid #eee;
+            padding: 12px;
+            border-radius: 8px;
+        }
+    
         ul {
-            padding-left: 20px;
+            list-style: none;
+            padding-left: 0;
         }
-
+    
         li {
-            margin: 6px 0;
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-
+    
+        .done {
+            text-decoration: line-through;
+            color: #888;
+        }
+    
         button {
-            margin-left: 10px;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -49,18 +66,60 @@
         const addBtn = getIdName('addBtn');
         const todoList = getIdName('todoList');
 
-        addBtn.addEventListener('click',function(){
+        const TODOS_KEY = 'todos_v1';
+        let todos = JSON.parse(localStorage.getItem(TODOS_KEY) || '[]');
+
+        const renderTodos = () => {
+            todoList.innerHTML = '';
+            todos.forEach((todo, idx) => {
+                const li = document.createElement('li');
+                li.dataset.index = idx;
+                li.innerHTML = `
+                    <span class="${todo.done ? 'done': ''}">${escapeHTML(todo.text)}</span>
+                    <div>
+                        <button data-action="toggle">✓</button>
+                        <button data-action="delete">✕</button>    
+                    </div>
+                `;
+                todoList.appendChild(li);
+            });
+            localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
+        }
+
+        addBtn.addEventListener('click', () => {
             const inputValue = todoInput.value;
-            if(inputValue){
-               const li = document.createElement('li');
-               li.textContent = inputValue +' - remove';
-               todoList.appendChild(li);
-           }else{
-               alert('please type somethings..');
-           }
-           todoInput.value = '';
-           todoInput.focus();
+            if (inputValue) {
+                todos.push({ text: inputValue, done: false });
+                todoInput.value = '';
+                todoInput.focus();
+            } else {
+                alert('please type somethings..');
+            }
+            renderTodos();
+            todoInput.value = '';
+            todoInput.focus();
         });
+
+
+         function escapeHTML(s) {
+            return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        todoList.addEventListener('click', (e) => {
+            const action = e.target.dataset.action;
+            if (!action) return;
+            const li = e.target.closest('li');
+            const idx = Number(li.dataset.index);
+            if (action === 'toggle') {
+                todos[idx].done = !todos[idx].done;
+            } else if (action === 'delete') {
+                todos.splice(idx, 1);
+            }
+            renderTodos();
+        });
+
+        // Initial render
+        renderTodos();
 
     </script>
 
